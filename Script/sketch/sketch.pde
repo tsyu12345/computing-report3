@@ -7,7 +7,7 @@ int m;
 int[] source;
 int[] target;
 double alpha = 1.0;
-int r = 5;
+int r;
 
 int[] degree;
 int maxDegree;
@@ -25,19 +25,10 @@ void setup() {
 }
 
 void draw() {
-  background(255);
+  background(#FFFFFF);
   drawObjects();
   updatePosition();
   updateVelocity();
-}
-
-
-int[] StrToInt(String[] str_array) {
-  int[] int_array = new int[str_array.length];
-  for(int i = 0; i < int_array.length; i++) {
-    int_array[i] = int(str_array[i]);
-  }
-  return int_array;
 }
 
 void initializeGraph(int k) {
@@ -51,8 +42,8 @@ void initializeGraph(int k) {
   String[] target_list = loadStrings("target.txt");
   source = new int[sorce_list.length];
   target = new int[target_list.length];
-  source = StrToInt(sorce_list);
-  target = StrToInt(target_list);
+  source = ConvertStringToIntArray(sorce_list);
+  target = ConvertStringToIntArray(target_list);
   degree = new int[n];
   for(int i = 0; i < n; i++) {
     degree[i] = 0;
@@ -72,7 +63,7 @@ void initializeGraph(int k) {
 
 void drawObjects() {
   String[] weight_list = loadStrings("weight.txt");
-  int[] weight = StrToInt(weight_list);
+  int[] weight = ConvertStringToIntArray(weight_list);
   for (int i = 0; i < m; ++i) {
     int s = source[i];
     int t = target[i];
@@ -80,17 +71,19 @@ void drawObjects() {
     strokeWeight(w/5);
     line(x[s], y[s], x[t], y[t]);
   }
-  String[] color_list = loadStrings("group.txt");
-  int[] group = StrToInt(color_list);
+  String[] group_list = loadStrings("group.txt");
+  String[] name_list = loadStrings("name.txt");
+  int[] group = ConvertStringToIntArray(group_list);
   int[] colors = {360, 300, 200, 170,150, 130, 100, 70, 50, 30, 0};
   colorMode(HSB, 360, 100, 100);
+  textAlign(CENTER);
   for (int i = 0; i < n; ++i) {
     fill(colors[group[i]],100, 100);
-    r = 10;
-    println(degree[i]);
-    println("MAX" + maxDegree);
+    r = degree[i] + 5;
     ellipse(x[i], y[i], 2 * r, 2 * r);
-  }
+    fill(0);
+    text(name_list[i], x[i], y[i]);
+  } 
 }
 
 void updatePosition() {
@@ -104,11 +97,9 @@ void updateVelocity() {
   double decay = 0.99;
   applySpringForce(0.01, 50);
   applyRepulsiveForce(50);
-  applyCenteringForce(0.1);
+  applyCenteringForce(0.05);
   applyResistanceForce(1-alpha);
-  //applyCentering();
   alpha *= decay;
-  //print(alpha);
 }
 
 void applySpringForce(float k, int L) {
@@ -146,6 +137,7 @@ void applyResistanceForce(double k) {
   }
 }
 
+/*
 void applyCentering() {
   int cx = 0;
   int cy = 0;
@@ -160,7 +152,7 @@ void applyCentering() {
     y[i] += -cy + height / 2;
   }
 }
-
+*/
 void applyCenteringForce(float strength) {
   for (int i = 0; i < n; ++i) {
     vx[i] += (width / 2 - x[i]) * strength;
@@ -175,4 +167,12 @@ float distance(int i, int j) {
     return minDistance;
   }
   return d;
+}
+
+int[] ConvertStringToIntArray(String[] str_array) {
+  int[] int_array = new int[str_array.length];
+  for(int i = 0; i < int_array.length; i++) {
+    int_array[i] = int(str_array[i]);
+  }
+  return int_array;
 }
